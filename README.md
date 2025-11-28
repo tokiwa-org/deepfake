@@ -133,17 +133,37 @@ pip install -r requirements.txt
 
 **データセットの取得方法**:
 
-1. **Kaggle FFHQ Dataset（推奨）**
-   - [Flickr-Faces-HQ (FFHQ)](https://www.kaggle.com/datasets/arnaud58/flickrfaceshq-dataset-ffhq) から高品質な顔画像をダウンロード
-   - ダウンロード後、2人分に分けて `data/person_a/` と `data/person_b/` に配置
+1. **Kaggle API（推奨）**
+   ```bash
+   # Kaggle APIのインストール
+   pip install kaggle
 
-2. **動画から抽出**
+   # APIキーの設定（~/.kaggle/kaggle.json に配置）
+   # https://www.kaggle.com/settings で「Create New Token」からダウンロード
+
+   # FFHQ データセットのダウンロード
+   kaggle datasets download -d arnaud58/flickrfaceshq-dataset-ffhq
+
+   # 解凍して2人分に分ける
+   unzip flickrfaceshq-dataset-ffhq.zip -d ffhq_temp
+   mkdir -p data/person_a data/person_b
+
+   # 最初の500枚をperson_a、次の500枚をperson_bに
+   ls ffhq_temp/*.png | head -500 | xargs -I {} cp {} data/person_a/
+   ls ffhq_temp/*.png | tail -n +501 | head -500 | xargs -I {} cp {} data/person_b/
+   ```
+
+2. **Kaggle Webサイトから手動ダウンロード**
+   - [Flickr-Faces-HQ (FFHQ)](https://www.kaggle.com/datasets/arnaud58/flickrfaceshq-dataset-ffhq) からダウンロード
+   - 解凍後、2人分に分けて `data/person_a/` と `data/person_b/` に配置
+
+3. **動画から抽出**
    ```bash
    # ffmpegで動画からフレームを抽出（1秒あたり5フレーム）
    ffmpeg -i video.mp4 -vf fps=5 data/person_a/frame_%04d.jpg
    ```
 
-3. **自分で撮影**
+4. **自分で撮影**
    - 同意を得た人物の顔を様々な角度・表情で撮影
    - スマートフォンのカメラで十分
 
