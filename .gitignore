@@ -21,7 +21,9 @@ env/
 
 # Training outputs
 checkpoints/
+checkpoints_demo/
 runs/
+runs_demo/
 outputs/
 *.pt
 *.pth

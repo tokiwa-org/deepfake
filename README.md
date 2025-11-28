@@ -40,10 +40,14 @@
 
 ### なぜ軽量版を使うのか？
 
-1. **高速イテレーション**: 本番設定では1エポック60秒以上 → 軽量版は15秒
-2. **学習目的に最適**: アルゴリズムの理解に1億パラメータは不要
-3. **リソース効率**: M4 Macの16GB統合メモリで快適に動作
-4. **デバッグ容易**: 問題発見が速い
+本プロジェクトでは**軽量版をデフォルト**としています。理由は主に**ハードウェアスペックの制約**です：
+
+1. **GPU/メモリの制約**: 本番品質のモデル（5,000万〜2億パラメータ）には RTX 3090 / A100 クラスのGPUと大量のVRAMが必要。M4 Macの16GB統合メモリでは軽量版が最適
+2. **学習時間**: 本番設定では1エポック10〜30分 → 軽量版は約15秒で、実験を繰り返しやすい
+3. **教育目的に十分**: アルゴリズムの理解と動作確認には670万パラメータで十分
+4. **デバッグ容易**: 問題発見が速く、コードの理解に集中できる
+
+> 💡 **品質を求める場合**: 高品質な顔交換が必要な場合は、DeepFaceLab や SimSwap などの商用レベルのフレームワークを推奨します。
 
 ### 本番品質が必要な場合
 
@@ -121,9 +125,27 @@ pip install -r requirements.txt
 ### 1. データの準備
 
 `data/person_a/` と `data/person_b/` に顔画像を配置します。
+
+**画像の要件**:
 - 各人物500枚以上推奨
 - 顔がはっきり写った画像
 - 様々な表情・角度があると良い
+
+**データセットの取得方法**:
+
+1. **Kaggle FFHQ Dataset（推奨）**
+   - [Flickr-Faces-HQ (FFHQ)](https://www.kaggle.com/datasets/arnaud58/flickrfaceshq-dataset-ffhq) から高品質な顔画像をダウンロード
+   - ダウンロード後、2人分に分けて `data/person_a/` と `data/person_b/` に配置
+
+2. **動画から抽出**
+   ```bash
+   # ffmpegで動画からフレームを抽出（1秒あたり5フレーム）
+   ffmpeg -i video.mp4 -vf fps=5 data/person_a/frame_%04d.jpg
+   ```
+
+3. **自分で撮影**
+   - 同意を得た人物の顔を様々な角度・表情で撮影
+   - スマートフォンのカメラで十分
 
 ### 2. 学習の実行
 
@@ -138,7 +160,13 @@ python train.py --data-a data/person_a --data-b data/person_b \
 
 ### 3. 学習の監視
 
+TensorBoardで学習の進捗を可視化できます：
+
 ```bash
+# TensorBoardのインストール（初回のみ）
+pip install tensorboard
+
+# TensorBoardの起動
 tensorboard --logdir runs
 # ブラウザで http://localhost:6006 を開く
 ```
@@ -175,6 +203,45 @@ swapped = model.swap_face(face_a, target_person='b')
 | `--lr` | 0.0001 | 学習率 |
 | `--perceptual` | False | Perceptual Lossを有効化 |
 | `--resume` | None | チェックポイントから再開 |
+
+---
+
+## Jupyter Notebook の使い方
+
+`notebooks/01_understanding_deepfake.ipynb` でDeepfake技術を対話的に学べます。
+
+### VS Code での実行
+
+1. **Python環境の設定**
+   ```bash
+   # venvを Jupyter カーネルとして登録
+   source venv/bin/activate
+   pip install ipykernel
+   python -m ipykernel install --user --name=deepfake --display-name "Python (deepfake)"
+   ```
+
+2. **ノートブックを開く**
+   - VS Code で `notebooks/01_understanding_deepfake.ipynb` を開く
+
+3. **カーネルの選択**
+   - 右上のカーネル選択をクリック
+   - 「Select Another Kernel...」→「Jupyter Kernel...」
+   - 「**Python (deepfake)**」を選択
+
+4. **実行**
+   - 「Run All」で全セルを順番に実行
+   - または Shift+Enter で1セルずつ実行
+
+> ⚠️ **注意**: ノートブックは必ず**最初のセルから順番に実行**してください。途中のセルだけ実行すると、変数やインポートが定義されていないエラーになります。
+
+### JupyterLab での実行
+
+```bash
+source venv/bin/activate
+pip install jupyterlab
+jupyter lab
+# ブラウザで自動的に開きます
+```
 
 ---
 
