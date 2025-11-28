@@ -1,0 +1,30 @@
+# PyTorch with MPS support (M4 Mac)
+torch>=2.1.0
+torchvision>=0.16.0
+torchaudio>=2.1.0
+
+# Image processing
+opencv-python>=4.8.0
+Pillow>=10.0.0
+
+# Face detection and alignment (optional - comment out if build fails)
+# face-alignment>=1.4.0
+# dlib>=19.24.0
+
+# Deep learning utilities
+numpy>=1.24.0
+scipy>=1.11.0
+
+# Visualization
+matplotlib>=3.8.0
+tensorboard>=2.15.0
+
+# Jupyter for learning
+jupyter>=1.0.0
+ipywidgets>=8.1.0
+
+# Progress bars
+tqdm>=4.66.0
+
+# Configuration
+pyyaml>=6.0.0
